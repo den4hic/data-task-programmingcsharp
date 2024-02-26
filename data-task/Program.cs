@@ -1,8 +1,11 @@
+using data_task.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IBirthdayService, BirthdayService>();
 
 var app = builder.Build();
 
