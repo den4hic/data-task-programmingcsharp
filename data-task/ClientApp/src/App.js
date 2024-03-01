@@ -19,7 +19,6 @@ const App = () => {
             if (!response.ok) {
                 if (response.status === 400) {
                     const result = await response.json();
-                    console.log(result);
                     setError(true);
                     setResult(result.errorMessage);
                 } else {
@@ -27,7 +26,6 @@ const App = () => {
                 }
             } else {
                 const result = await response.json();
-                console.log(result);
                 setResult(result);
                 setError(false);
             }
@@ -37,11 +35,11 @@ const App = () => {
     };
 
     return (
-        <div>
-            <h1>Birthday App</h1>
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+            <h1 style={{ color: '#333' }}>Birthday App</h1>
             <BirthdayForm onSubmit={handleDateChange} />
             {result && !error && <BirthdayResult {...result} />}
-            {error && <p>{result}</p>}
+            {error && <p style={{ color: 'red' }}>{result}</p>}
         </div>
     );
 };
