@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
-import BirthdayForm from './components/BirthdayForm';
-import BirthdayResult from './components/BirthdayResult';
+import BirthdayForm from './components/PersonForm';
+import BirthdayResult from './components/PersonResult';
 
 const App = () => {
     const [result, setResult] = useState(null);
     const [error, setError] = useState(null);
 
-    const handleDateChange = async (birthdate) => {
+    const handleDateChange = async (personalInfo) => {
+        const { firstName, lastName, email, birthdate } = personalInfo;
+
+        console.log(personalInfo);
+
         try {
-            const response = await fetch('birthday', {
+            const response = await fetch('person', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(birthdate.birthdate),
+                body: JSON.stringify({ firstName, lastName, email, birthdate }),
             });
 
             if (!response.ok) {
@@ -26,6 +30,7 @@ const App = () => {
                 }
             } else {
                 const result = await response.json();
+                console.log(result);
                 setResult(result);
                 setError(false);
             }
