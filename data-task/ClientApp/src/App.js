@@ -5,9 +5,11 @@ import BirthdayResult from './components/PersonResult';
 const App = () => {
     const [result, setResult] = useState(null);
     const [error, setError] = useState(null);
+    const [waitForResult, setWaitForResult] = useState(false);
 
     const handleDateChange = async (personalInfo) => {
         const { firstName, lastName, email, birthdate } = personalInfo;
+        setWaitForResult(true);
 
         console.log(personalInfo);
 
@@ -34,6 +36,7 @@ const App = () => {
                 setResult(result);
                 setError(false);
             }
+            setWaitForResult(false);
         } catch (error) {
             console.error(error.message);
         }
@@ -42,7 +45,7 @@ const App = () => {
     return (
         <div style={{ textAlign: 'center', padding: '20px' }}>
             <h1 style={{ color: '#333' }}>Birthday App</h1>
-            <BirthdayForm onSubmit={handleDateChange} />
+            <BirthdayForm onSubmit={handleDateChange} waitForResult={waitForResult} />
             {result && !error && <BirthdayResult {...result} />}
             {error && <p style={{ color: 'red' }}>{result}</p>}
         </div>

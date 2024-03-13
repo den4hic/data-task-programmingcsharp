@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 
-const BirthdayForm = ({ onSubmit }) => {
+const BirthdayForm = ({ onSubmit, waitForResult }) => {
     const [birthdate, setBirthdate] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -34,7 +34,7 @@ const BirthdayForm = ({ onSubmit }) => {
                 Enter your birthdate:
                 <input type="date" name="birthdate" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} />
             </label>
-            <button type="submit" disabled={!isFormValid}>Proceed</button>
+            <button type="submit" disabled={!isFormValid || waitForResult}>Proceed</button>
         </form>
     );
 };
