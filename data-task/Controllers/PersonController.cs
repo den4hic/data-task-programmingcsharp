@@ -1,4 +1,5 @@
-﻿using data_task.Models;
+﻿using data_task.Exceptions;
+using data_task.Models;
 using data_task.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -35,15 +36,24 @@ namespace data_task.Controllers
 				Email = request.Email,
 				Birthdate = DateTime.Parse(request.Birthdate)
 			};
-
-			var result = await _personService.CalculatePersonInfoAsync(personModel);
-
-			if (!string.IsNullOrEmpty(result.ErrorMessage))
+			
+			try
 			{
-				return BadRequest(result);
+				var result = await _personService.CalculatePersonInfoAsync(personModel);
+				return new JsonResult(result);
 			}
-
-			return new JsonResult(result);
+			catch (FutureBirthdateException ex)
+			{
+				return BadRequest(new Person() { ErrorMessage = ex.Message });
+			}
+			catch (AncientBirthdateException ex)
+			{
+				return BadRequest(new Person() { ErrorMessage = ex.Message });
+			}
+			catch (InvalidEmailException ex)
+			{
+				return BadRequest(new Person() { ErrorMessage = ex.Message });
+			}
 		}
 	}
 }

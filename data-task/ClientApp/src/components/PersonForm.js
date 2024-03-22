@@ -28,7 +28,7 @@ const BirthdayForm = ({ onSubmit, waitForResult }) => {
             </label>
             <label>
                 Email:
-                <input type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <input type="text" name="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             </label>
             <label>
                 Enter your birthdate:
