@@ -1,4 +1,5 @@
-﻿using data_task.Models;
+﻿using data_task.Exceptions;
+using data_task.Models;
 using System.Globalization;
 
 namespace data_task.Services
@@ -13,20 +14,19 @@ namespace data_task.Services
 			if(model.Birthdate > today.AddYears(-age))
 				age--;
 
-			if (age > 135)
+			if (model.Birthdate > today)
 			{
-				return new Person
-				{
-					ErrorMessage = "The age is too high"
-				};
+				throw new FutureBirthdateException("Дата народження не може бути у майбутньому.");
 			}
 
-			if (age < 0)
+			if (age > 135)
 			{
-				return new Person
-				{
-					ErrorMessage = "The age is negative"
-				};
+				throw new AncientBirthdateException("Дата народження занадто давня.");
+			}
+
+			if (!IsValidEmail(model.Email))
+			{
+				throw new InvalidEmailException("Недійсна адреса електронної пошти.");
 			}
 
 			Task<bool> isAdultTask = IsAdultAsync(age);
@@ -108,5 +108,19 @@ namespace data_task.Services
 				return chineseZodiacSigns[index - 1];
 			});
 		}
+
+		private bool IsValidEmail(string email)
+		{
+			try
+			{
+				var addr = new System.Net.Mail.MailAddress(email);
+				return addr.Address == email;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
 	}
 }
