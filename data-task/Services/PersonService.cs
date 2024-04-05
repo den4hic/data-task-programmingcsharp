@@ -1,11 +1,26 @@
 ﻿using data_task.Exceptions;
 using data_task.Models;
+using Newtonsoft.Json;
 using System.Globalization;
+using System.Security.AccessControl;
+using System.Text.Json;
 
 namespace data_task.Services
 {
 	public class PersonService : IPersonService
 	{
+		public async Task<List<Person>> ProcessUsersFromFileAsync(string filePath)
+		{
+			string json = await File.ReadAllTextAsync(filePath);
+			List<Person> userData = JsonConvert.DeserializeObject<List<Person>>(json);
+			if (userData == null)
+			{
+				return new List<Person>();
+			}
+			return userData;
+		}
+
+
 		public async Task<Person> CalculatePersonInfoAsync(PersonModel model)
 		{
 			DateTime today = DateTime.Today;
@@ -45,7 +60,7 @@ namespace data_task.Services
 				ChineseZodiacSign = chineseSignTask.Result
 			};
 
-			return new Person(model.FirstName, model.LastName, model.Email, model.Birthdate, birthdayInfo);
+			return new Person(model.Id, model.FirstName, model.LastName, model.Email, model.Birthdate, birthdayInfo);
 
 		}
 
@@ -105,7 +120,7 @@ namespace data_task.Services
 
 				string[] chineseZodiacSigns = { "Rat", "Ox", "Tiger", "Rabbit", "Dragon", "Snake", "Horse", "Goat", "Monkey", "Rooster", "Dog", "Pig" };
 				int index = year % 12;
-				return chineseZodiacSigns[index - 1];
+				return chineseZodiacSigns[index == 0 ? 11 : index - 1];
 			});
 		}
 
@@ -122,5 +137,92 @@ namespace data_task.Services
 			}
 		}
 
+		public List<Person> MakeSort(List<Person> users, string sortField, string sortDirection)
+		{
+			if (!string.IsNullOrEmpty(sortField))
+			{
+				switch (sortField)
+				{
+					case "firstName":
+						users = sortDirection == "asc" ? users.OrderBy(p => p.FirstName).ToList() : users.OrderByDescending(p => p.FirstName).ToList();
+						break;
+					case "lastName":
+						users = sortDirection == "asc" ? users.OrderBy(p => p.LastName).ToList() : users.OrderByDescending(p => p.LastName).ToList();
+						break;
+					case "emailAddress":
+						users = sortDirection == "asc" ? users.OrderBy(p => p.EmailAddress).ToList() : users.OrderByDescending(p => p.EmailAddress).ToList();
+						break;
+					case "birthdate":
+						users = sortDirection == "asc" ? users.OrderBy(p => p.BirthDate).ToList() : users.OrderByDescending(p => p.BirthDate).ToList();
+						break;
+					case "isAdult":
+						users = sortDirection == "asc" ? users.OrderBy(p => p.IsAdult).ToList() : users.OrderByDescending(p => p.IsAdult).ToList();
+						break;
+					case "sunSign":
+						users = sortDirection == "asc" ? users.OrderBy(p => p.SunSign).ToList() : users.OrderByDescending(p => p.SunSign).ToList();
+						break;
+					case "chineseSign":
+						users = sortDirection == "asc" ? users.OrderBy(p => p.ChineseSign).ToList() : users.OrderByDescending(p => p.ChineseSign).ToList();
+						break;
+					case "isBirthday":
+						users = sortDirection == "asc" ? users.OrderBy(p => p.IsBirthday).ToList() : users.OrderByDescending(p => p.IsBirthday).ToList();
+						break;
+					default:
+						throw new InvalidSortFieldException("Wrong sort field.");
+				}
+			}
+
+			return users;
+		}
+
+		public List<Person> SearchUsers(List<Person> cachedUsers, string? searchTerm)
+		{
+			return cachedUsers.Where(u => u.FirstName.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase) || u.LastName.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+		}
+
+		public List<Person> SearchDateRange(List<Person> filteredUsers, string? startDate, string? endDate)
+		{
+			return filteredUsers.Where(u => u.BirthDate >= DateTime.Parse(startDate) && u.BirthDate <= DateTime.Parse(endDate)).ToList();
+		}
+
+		public List<Person> SearchSunSign(List<Person> filteredUsers, string searchSunSign)
+		{
+			return filteredUsers.Where(u => u.SunSign.StartsWith(searchSunSign, StringComparison.OrdinalIgnoreCase)).ToList();
+		}
+
+		public List<Person> SearchChineseSign(List<Person> filteredUsers, string searchChineseSign)
+		{
+			return filteredUsers.Where(u => u.ChineseSign.StartsWith(searchChineseSign, StringComparison.OrdinalIgnoreCase)).ToList();
+		}
+
+		public List<Person> SearchEmail(List<Person> filteredUsers, string searchEmail)
+		{
+			return filteredUsers.Where(u => u.EmailAddress.StartsWith(searchEmail, StringComparison.OrdinalIgnoreCase)).ToList();
+		}
+
+		public void SerializeUsersToFile(List<Person> users, string filePath)
+		{
+			try
+			{
+				string jsonData = System.Text.Json.JsonSerializer.Serialize(users, new JsonSerializerOptions { WriteIndented = true });
+
+				File.WriteAllText(filePath, jsonData);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("Something wrong: " + ex.Message);
+			}
+
+		}
+
+		public List<Person> FilterAdult(List<Person> filteredUsers, string? filterIsAdult)
+		{
+			return filteredUsers.Where(u => u.IsAdult == (filterIsAdult == "true")).ToList();
+		}
+
+		public List<Person> FilterBirthday(List<Person> filteredUsers, string? filterIsAdult)
+		{
+			return filteredUsers.Where(u => u.IsBirthday == (filterIsAdult == "true")).ToList();
+		}
 	}
 }
