@@ -2,28 +2,26 @@
 {
 	public class Person
 	{
-		public string FirstName { get; set; }
+        public int Id { get; set; }
+        public string FirstName { get; set; }
 		public string LastName { get; set; }
 		public string EmailAddress { get; set; }
 		public DateTime BirthDate { get; set; }
         public string ErrorMessage { get; set; }
-        private readonly bool isAdult;
-		private readonly string sunSign;
-		private readonly string chineseSign;
-		private readonly bool isBirthday;
 
-		public bool IsAdult { get { return isAdult; } }
-		public string SunSign { get { return sunSign; } }
-		public string ChineseSign { get { return chineseSign; } }
-		public bool IsBirthday { get { return isBirthday; } }
+		public bool IsAdult { get; set;  }
+		public string SunSign { get; set; }
+		public string ChineseSign { get; set; }
+		public bool IsBirthday { get; set; }
 
-		public Person(string firstName, string lastName, string emailAddress, DateTime birthDate, BirthdayResult birthdayInfo)
+		public Person(int id, string firstName, string lastName, string emailAddress, DateTime birthDate, BirthdayResult birthdayInfo)
 			:this(firstName, lastName, emailAddress, birthDate)
 		{
-			isAdult = birthdayInfo.IsAdult;
-			sunSign = birthdayInfo.WesternZodiacSign;
-			chineseSign = birthdayInfo.ChineseZodiacSign;
-			isBirthday = birthdayInfo.IsBirthdayToday;
+			Id = id;
+			IsAdult = birthdayInfo.IsAdult;
+			SunSign = birthdayInfo.WesternZodiacSign;
+			ChineseSign = birthdayInfo.ChineseZodiacSign;
+			IsBirthday = birthdayInfo.IsBirthdayToday;
 		}
 
 		public Person(string firstName, string lastName, string emailAddress, DateTime birthDate)
